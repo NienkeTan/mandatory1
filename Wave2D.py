@@ -185,13 +185,11 @@ class Wave2D_Neumann(Wave2D):
 def test_convergence_wave2d():
     sol = Wave2D()
     r, E, h = sol.convergence_rates(m=5,mx=2, my=3)
-    print(abs(r[-1]-2))
     assert abs(r[-1]-2) < 1e-2
 
 def test_convergence_wave2d_neumann():
     solN = Wave2D_Neumann()
     r, E, h = solN.convergence_rates(mx=2, my=3)
-    print(r)
     assert abs(r[-1]-2) < 0.05
 
 def test_exact_wave2d():
@@ -219,16 +217,18 @@ test_exact_wave2d()
 # plt.show()
 
 # Animation
-# wave = Wave2D()
-# data = wave(40, 171, cfl=0.71, store_data=1)
+wave = Wave2D_Neumann()
+data = wave(N=40, Nt=301,mx=2, my=2, cfl=1/np.sqrt(2), store_data=1)
 
-# fig, ax = plt.subplots(subplot_kw={"projection": "3d"})
-# frames = []
-# for n, val in data.items():
-#     frame = ax.plot_surface(wave.xij, wave.yij, val,  cmap=cm.coolwarm, linewidth=0, antialiased=False)
-#     frames.append([frame])
-# ani = animation.ArtistAnimation(fig, frames, interval=400, blit=True, repeat_delay=1000)
-# ani.save('wavemovie2d.apng', writer='pillow', fps=5)
+fig, ax = plt.subplots(subplot_kw={"projection": "3d"})
+frames = []
+for n, val in data.items():
+    frame = ax.plot_surface(wave.xij, wave.yij, val,  cmap=cm.coolwarm, linewidth=0)
+    frames.append([frame])
+ax.set_title(r'Neumann wave')
+ax.text2D(0.05, 0.97, r'$u(t, x, y) = \cos(2 \pi x)\cos(2 \pi y)\cos(\omega t)$,      $C = \frac{1}{\sqrt{2}}$', transform=ax.transAxes)
+ani = animation.ArtistAnimation(fig, frames, interval=400, blit=True, repeat_delay=1000)
+ani.save('report/neumannwave.gif', writer='pillow', fps=10)
 
 
 
