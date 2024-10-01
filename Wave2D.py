@@ -171,24 +171,29 @@ class Wave2D:
 
 class Wave2D_Neumann(Wave2D):
 
-    def D2(self, N):
-        raise NotImplementedError
+    def D2(self):
+        D = sparse.diags([1, -2, 1], [-1, 0, 1], (self.N+1, self.N+1), 'lil')
+        D[0, :4] = -2, 2, 0, 0
+        D[-1, -4:] = 0, 0, 2, -2
+        D /= self.h**2
+        return D
 
     def ue(self, mx, my):
-        raise NotImplementedError
+        return sp.cos(mx*sp.pi*x)*sp.cos(my*sp.pi*y)*sp.cos(self.w*t)
 
     def apply_bcs(self):
-        raise NotImplementedError
+        pass
 
 def test_convergence_wave2d():
     sol = Wave2D()
-    r, E, h = sol.convergence_rates(m=4,mx=2, my=3)
+    r, E, h = sol.convergence_rates(m=5,mx=2, my=3)
     print(abs(r[-1]-2))
     assert abs(r[-1]-2) < 1e-2
 
 def test_convergence_wave2d_neumann():
     solN = Wave2D_Neumann()
     r, E, h = solN.convergence_rates(mx=2, my=3)
+    print(r)
     assert abs(r[-1]-2) < 0.05
 
 def test_exact_wave2d():
@@ -196,6 +201,7 @@ def test_exact_wave2d():
 
 
 test_convergence_wave2d()
+test_convergence_wave2d_neumann()
 # wave = Wave2D()
 # h, error = wave(40, 171, cfl=0.71, store_data=5)
 # fig, ax = plt.subplots(subplot_kw={"projection": "3d"})
