@@ -22,8 +22,6 @@ class Wave2D:
     def D2(self):
         """Return second order differentiation matrix"""
         D = sparse.diags([1, -2, 1], [-1, 0, 1], (self.N+1, self.N+1), 'lil')
-        D[0, :4] = 2, -5, 4, -1
-        D[-1, -4:] = -1, 4, -5, 2
         D /= self.h**2
         return D
 
@@ -197,11 +195,23 @@ def test_convergence_wave2d_neumann():
     assert abs(r[-1]-2) < 0.05
 
 def test_exact_wave2d():
-    raise NotImplementedError
+    mx = 3
+    C = 1/np.sqrt(2)
+
+    # Dirichlet
+    sol = Wave2D()
+    r, E, h = sol.convergence_rates(cfl=C, mx=mx, my=mx)
+    assert np.all(E < 1e-12)
+
+    # Neumann
+    solN = Wave2D_Neumann()
+    r, E, h = solN.convergence_rates(cfl=C, mx=mx, my=mx)
+    assert np.all(E < 1e-12)
 
 
 test_convergence_wave2d()
 test_convergence_wave2d_neumann()
+test_exact_wave2d()
 # wave = Wave2D()
 # h, error = wave(40, 171, cfl=0.71, store_data=5)
 # fig, ax = plt.subplots(subplot_kw={"projection": "3d"})
@@ -209,16 +219,16 @@ test_convergence_wave2d_neumann()
 # plt.show()
 
 # Animation
-wave = Wave2D()
-data = wave(40, 171, cfl=0.71, store_data=1)
+# wave = Wave2D()
+# data = wave(40, 171, cfl=0.71, store_data=1)
 
-fig, ax = plt.subplots(subplot_kw={"projection": "3d"})
-frames = []
-for n, val in data.items():
-    frame = ax.plot_surface(wave.xij, wave.yij, val,  cmap=cm.coolwarm, linewidth=0, antialiased=False)
-    frames.append([frame])
-ani = animation.ArtistAnimation(fig, frames, interval=400, blit=True, repeat_delay=1000)
-ani.save('wavemovie2d.apng', writer='pillow', fps=5)
+# fig, ax = plt.subplots(subplot_kw={"projection": "3d"})
+# frames = []
+# for n, val in data.items():
+#     frame = ax.plot_surface(wave.xij, wave.yij, val,  cmap=cm.coolwarm, linewidth=0, antialiased=False)
+#     frames.append([frame])
+# ani = animation.ArtistAnimation(fig, frames, interval=400, blit=True, repeat_delay=1000)
+# ani.save('wavemovie2d.apng', writer='pillow', fps=5)
 
 
 
