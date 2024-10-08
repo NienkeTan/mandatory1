@@ -210,11 +210,6 @@ def test_exact_wave2d():
 test_convergence_wave2d()
 test_convergence_wave2d_neumann()
 test_exact_wave2d()
-wave = Wave2D()
-h, error = wave(40, 171, cfl=0.71, store_data=5)
-fig, ax = plt.subplots(subplot_kw={"projection": "3d"})
-surf = ax.plot_surface(wave.xij, wave.yij,data[15] ,cmap=cm.coolwarm, linewidth=0, antialiased=False)
-plt.show()
 
 # Animation
 wave = Wave2D_Neumann()
